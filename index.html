@@ -1,40 +1,230 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIP4F - Tweaked Apps & Games</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Tailwind CSS -->
+    <title>VIP4F - Premium Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-outer: #000000;
-            --bg-main: #0B1120;
-            --bg-card: #1A2234;
-            --text-main: #ffffff;
-            --text-muted: #8b94a5;
-            --primary: #5B65EB;
-            --primary-hover: #4f58d3;
-            --overlay: rgba(0, 0, 0, 0.8);
-            --border-color: rgba(255, 255, 255, 0.05);
-            --nav-bg: rgba(26, 34, 52, 0.98);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B0E14;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .light-mode {
-            --bg-outer: #e5e7eb;
-            --bg-main: #f8f9fa;
-            --bg-card: #ffffff;
-            --text-main: #111827;
-            --text-muted: #6b7280;
-            --overlay: rgba(255, 255, 255, 0.7);
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.1s linear;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .app-card {
+            transition: transform 0.2s;
+        }
+        .app-card:active {
+            transform: scale(0.96);
+        }
+
+        .glass-effect {
+            background: rgba(26, 31, 46, 0.8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Header -->
+    <header class="p-6 flex justify-between items-center bg-[#0B0E14]">
+        <div>
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-widest">Welcome to</p>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">VIP4F <span class="text-[#5B65EB]">Store</span></h1>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-[#1A1F2E] flex items-center justify-center border border-gray-800">
+            <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-6">
+        
+        <!-- Trending Section -->
+        <section class="mb-10">
+            <h2 class="text-xl font-bold mb-5 flex items-center gap-2">
+                <i class="fa-solid fa-fire text-orange-500 text-sm"></i> Trending Apps
+            </h2>
+            <div id="trending-container" class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- All Apps Grid -->
+        <section class="mb-10">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-bold">New & Updated</h2>
+                <span class="text-[#5B65EB] text-sm font-bold">View All</span>
+            </div>
+            <div id="apps-list-container" class="space-y-4">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] glass-effect rounded-[2rem] border border-white/10 p-2 flex justify-around items-center z-50">
+        <button class="w-12 h-12 rounded-full bg-[#5B65EB] text-white flex items-center justify-center">
+            <i class="fa-solid fa-house"></i>
+        </button>
+        <button class="w-12 h-12 text-gray-400 flex items-center justify-center">
+            <i class="fa-solid fa-gamepad"></i>
+        </button>
+        <button class="w-12 h-12 text-gray-400 flex items-center justify-center">
+            <i class="fa-solid fa-layer-group"></i>
+        </button>
+        <button class="w-12 h-12 text-gray-400 flex items-center justify-center">
+            <i class="fa-solid fa-user"></i>
+        </button>
+    </nav>
+
+    <!-- App Details Modal -->
+    <div id="appDetailsModal" class="fixed inset-0 z-[100] hidden flex-col justify-end bg-black/80 backdrop-blur-sm">
+        <div class="bg-[#131722] w-full h-[88vh] rounded-t-[2.5rem] relative flex flex-col overflow-hidden animate-slide-up border-t border-white/10">
+            <!-- Close Bar -->
+            <div onclick="closeDetails()" class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mt-4 mb-2 opacity-50"></div>
+            
+            <button onclick="closeDetails()" class="absolute top-6 right-6 z-20 w-10 h-10 bg-black/40 text-white rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Header Image -->
+            <div class="h-44 w-full relative shrink-0">
+                <img id="detailHeaderImg" src="" class="w-full h-full object-cover opacity-30 blur-lg">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#131722] to-transparent"></div>
+            </div>
+
+            <!-- App Identity -->
+            <div class="px-8 relative -mt-16 flex items-end gap-5">
+                <img id="detailAppImg" src="" class="w-28 h-28 rounded-[1.5rem] shadow-2xl object-cover border-4 border-[#131722]">
+                <div class="pb-2">
+                    <span class="bg-[#5B65EB] text-white text-[10px] font-black px-2.5 py-1 rounded-md mb-2 inline-block uppercase tracking-wider">Verified Mod</span>
+                    <h2 id="detailAppName" class="text-2xl font-black text-white truncate leading-none">App Name</h2>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="px-8 mt-8 grid grid-cols-3 gap-1 border-y border-white/5 py-5">
+                <div class="flex flex-col items-center">
+                    <span id="detailAppRating" class="text-white font-bold text-lg">4.9 ★</span>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">Rating</span>
+                </div>
+                <div class="flex flex-col items-center border-x border-white/5">
+                    <span id="detailAppSize" class="text-white font-bold text-lg">120MB</span>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">Size</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-white font-bold text-lg">v2.4.1</span>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">Version</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="px-8 mt-6 flex-1 overflow-y-auto no-scrollbar pb-32">
+                <h3 class="text-white font-bold text-lg mb-2">Description</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Get the most out of your experience with this premium modified version. Everything is unlocked and ads are completely removed.
+                </p>
+                <div class="bg-[#1A1F2E] p-4 rounded-2xl border border-white/5">
+                    <h4 class="                <h2 class="text-xl font-bold">New & Updated</h2>
+                <span class="text-[#5B65EB] text-sm font-bold">View All</span>
+            </div>
+            <div id="apps-list-container" class="space-y-4">
+                <!-- Will be populated by JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] glass-effect rounded-[2rem] border border-white/10 p-2 flex justify-around items-center z-50">
+        <button class="w-12 h-12 rounded-full bg-[#5B65EB] text-white flex items-center justify-center">
+            <i class="fa-solid fa-house"></i>
+        </button>
+        <button class="w-12 h-12 text-gray-400 flex items-center justify-center">
+            <i class="fa-solid fa-gamepad"></i>
+        </button>
+        <button class="w-12 h-12 text-gray-400 flex items-center justify-center">
+            <i class="fa-solid fa-layer-group"></i>
+        </button>
+        <button class="w-12 h-12 text-gray-400 flex items-center justify-center">
+            <i class="fa-solid fa-user"></i>
+        </button>
+    </nav>
+
+    <!-- App Details Modal -->
+    <div id="appDetailsModal" class="fixed inset-0 z-[100] hidden flex-col justify-end bg-black/80 backdrop-blur-sm">
+        <div class="bg-[#131722] w-full h-[88vh] rounded-t-[2.5rem] relative flex flex-col overflow-hidden animate-slide-up border-t border-white/10">
+            <!-- Close Bar -->
+            <div onclick="closeDetails()" class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mt-4 mb-2 opacity-50"></div>
+            
+            <button onclick="closeDetails()" class="absolute top-6 right-6 z-20 w-10 h-10 bg-black/40 text-white rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Header Image -->
+            <div class="h-44 w-full relative shrink-0">
+                <img id="detailHeaderImg" src="" class="w-full h-full object-cover opacity-30 blur-lg">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#131722] to-transparent"></div>
+            </div>
+
+            <!-- App Identity -->
+            <div class="px-8 relative -mt-16 flex items-end gap-5">
+                <img id="detailAppImg" src="" class="w-28 h-28 rounded-[1.5rem] shadow-2xl object-cover border-4 border-[#131722]">
+                <div class="pb-2">
+                    <span class="bg-[#5B65EB] text-white text-[10px] font-black px-2.5 py-1 rounded-md mb-2 inline-block uppercase tracking-wider">Verified Mod</span>
+                    <h2 id="detailAppName" class="text-2xl font-black text-white truncate leading-none">App Name</h2>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="px-8 mt-8 grid grid-cols-3 gap-1 border-y border-white/5 py-5">
+                <div class="flex flex-col items-center">
+                    <span id="detailAppRating" class="text-white font-bold text-lg">4.9 ★</span>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">Rating</span>
+                </div>
+                <div class="flex flex-col items-center border-x border-white/5">
+                    <span id="detailAppSize" class="text-white font-bold text-lg">120MB</span>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">Size</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-white font-bold text-lg">v2.4.1</span>
+                    <span class="text-[10px] text-gray-500 font-bold uppercase">Version</span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="px-8 mt-6 flex-1 overflow-y-auto no-scrollbar pb-32">
+                <h3 class="text-white font-bold text-lg mb-2">Description</h3>
+                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                    Get the most out of your experience with this premium modified version. Everything is unlocked and ads are completely removed.
+                </p>
+                <div class="bg-[#1A1F2E] p-4 rounded-2xl border border-white/5">
+                    <h4 class="            --overlay: rgba(255, 255, 255, 0.7);
             --border-color: rgba(0, 0, 0, 0.08);
             --nav-bg: rgba(255, 255, 255, 0.98);
         }
