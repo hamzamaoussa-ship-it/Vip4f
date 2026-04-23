@@ -1,0 +1,586 @@
+```html
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP4F - Tweaked Apps & Games</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        :root {
+            --bg-outer: #000000;
+            --bg-main: #0B1120;
+            --bg-card: #1A2234;
+            --text-main: #ffffff;
+            --text-muted: #8b94a5;
+            --primary: #5B65EB;
+            --primary-hover: #4f58d3;
+            --overlay: rgba(0, 0, 0, 0.8);
+            --border-color: rgba(255, 255, 255, 0.05);
+            --nav-bg: rgba(26, 34, 52, 0.98);
+        }
+
+        .light-mode {
+            --bg-outer: #e5e7eb;
+            --bg-main: #f8f9fa;
+            --bg-card: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --overlay: rgba(255, 255, 255, 0.7);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --nav-bg: rgba(255, 255, 255, 0.98);
+        }
+
+        body {
+            background-color: var(--bg-outer);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .mobile-container {
+            background-color: var(--bg-main);
+            min-height: 100vh;
+            max-width: 480px;
+            margin: 0 auto;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.3);
+            overflow-x: hidden;
+            transition: background-color 0.3s;
+        }
+
+        .bg-card-custom {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .text-custom { color: var(--text-main); }
+        .text-muted-custom { color: var(--text-muted); }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .video-thumbnail {
+            background: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
+        }
+
+        #modalsOverlay {
+            background: var(--overlay);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-enter { animation: modalFadeIn 0.3s ease-out forwards; }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        @keyframes fadeInUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loader-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+        }
+        .concentric-loader {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .concentric-loader div {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: var(--primary);
+            opacity: 0.6;
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        .concentric-loader div:nth-child(2) {
+            animation-delay: -0.5s;
+            background-color: #3b44b8;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.3); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        #bottom-nav {
+            background: var(--nav-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease-in-out;
+            transform: translate(-50%, 0);
+        }
+
+        .instruction-number {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; flex-shrink: 0; margin-top: 2px;
+        }
+
+        .app-icon {
+            border-radius: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- النوافذ المنبثقة -->
+    <div id="modalsOverlay" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <!-- نافذة الترحيب -->
+        <div id="welcomeModal" class="bg-card-custom w-full max-w-[340px] rounded-[1.8rem] p-8 text-center modal-enter shadow-2xl border border-gray-700/30">
+            <h2 class="text-3xl font-bold mb-4 tracking-wide text-custom flex justify-center items-baseline">
+                Welcome to<br>
+            </h2>
+            <h2 class="text-3xl font-bold mb-4 tracking-wide text-custom flex justify-center items-baseline">
+                V<span class="relative inline-flex justify-center">
+                    <i class="fa-solid fa-crown text-[#FFD700] absolute -top-4 text-[16px] drop-shadow-md"></i>
+                    I
+                </span>P<span class="text-[#5B65EB]">4F</span>
+            </h2>
+            <p class="text-muted-custom mb-8 text-sm leading-relaxed">
+                Here you will be able to download tweaked Apps/Games for FREE.
+            </p>
+            <button onclick="showImportantModal()" class="w-full bg-[#5B65EB] hover:bg-[#4f58d3] text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-[#5B65EB]/30">
+                CONTINUE
+            </button>
+        </div>
+
+        <!-- نافذة التحذير -->
+        <div id="importantModal" class="bg-card-custom w-full max-w-[340px] rounded-[1.8rem] p-8 text-center hidden shadow-2xl border border-gray-700/30">
+            <div class="mx-auto mb-4 text-[#5B65EB] flex items-center justify-center">
+                <i class="fa-solid fa-hexagon-exclamation text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-4 tracking-wide text-custom uppercase">IMPORTANT:</h2>
+            <p class="text-muted-custom mb-8 text-sm leading-relaxed">
+                Before installing the app you want, we recommend you watch the tutorial on site to understand how to get it.
+            </p>
+            <button onclick="closeModals()" class="w-full bg-[#5B65EB] hover:bg-[#4f58d3] text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-[#5B65EB]/30">
+                CONTINUE
+            </button>
+        </div>
+
+        <!-- نافذة التعليمات -->
+        <div id="instructionsModal" class="bg-card-custom w-full max-w-[340px] rounded-[1.8rem] p-8 hidden shadow-2xl border border-gray-700/30">
+            <h2 class="text-2xl font-bold mb-6 text-center text-custom">Instructions</h2>
+            <ul class="space-y-5 text-left mb-8">
+                <li class="flex items-start gap-3">
+                    <span class="instruction-number">1</span>
+                    <span class="text-custom text-sm font-medium leading-tight">First Search the Name of The App You Want</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="instruction-number">2</span>
+                    <span class="text-custom text-sm font-medium leading-tight">Tap The Download Button on it</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="instruction-number">3</span>
+                    <span class="text-custom text-sm font-medium leading-tight">Wait About 1 Minute for it to Load</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="instruction-number">4</span>
+                    <span class="text-custom text-sm font-medium leading-tight">Complete The Additional Plug In Files Task, To Finish Installing Your App</span>
+                </li>
+            </ul>
+            <button onclick="closeModals()" class="w-full bg-[#5B65EB] hover:bg-[#4f58d3] text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-[#5B65EB]/30">
+                CLOSE
+            </button>
+        </div>
+    </div>
+
+    <!-- حاوية الموبايل -->
+    <div class="mobile-container pb-28 flex flex-col">
+        
+        <!-- الهيدر -->
+        <header class="sticky top-0 z-40 bg-[var(--bg-main)]/95 backdrop-blur-md px-4 py-4 flex items-center justify-between gap-4">
+            <div class="flex items-center">
+                <span class="text-3xl font-black tracking-tighter text-custom flex items-baseline">
+                    V<span class="relative inline-flex justify-center mx-[1px]">
+                        <i class="fa-solid fa-crown text-[#FFD700] absolute -top-3.5 text-[14px] drop-shadow-md z-10"></i>
+                        I
+                    </span>P<span class="text-[#5B65EB]">4F</span>
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-3 flex-1 justify-end">
+                <button onclick="toggleTheme()" id="themeBtn" class="w-10 h-10 rounded-full bg-card-custom flex items-center justify-center text-muted-custom hover:text-[#5B65EB] transition border border-[var(--border-color)] shadow-sm">
+                    <i class="fa-regular fa-sun text-lg" id="themeIcon"></i>
+                </button>
+                <div class="relative flex-1 max-w-[180px]">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#5B65EB]">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </div>
+                    <input type="text" placeholder="Search..." class="w-full bg-card-custom text-custom text-sm rounded-full py-2 pl-9 pr-4 focus:outline-none border border-[var(--border-color)] transition shadow-sm">
+                </div>
+            </div>
+        </header>
+
+        <main class="px-4 mt-2 flex-grow relative" id="main-content">
+            
+            <!-- قسم Discover -->
+            <div id="discover-content" class="block">
+                
+                <!-- الفيديو -->
+                <section class="mb-8">
+                    <div class="relative w-full rounded-[1.2rem] overflow-hidden video-thumbnail aspect-[16/9] flex items-center justify-center shadow-lg mb-4">
+                        <div class="absolute top-3 left-3 flex items-center gap-2">
+                            <img src="https://ui-avatars.com/api/?name=K+G&background=random" class="w-8 h-8 rounded-full border border-white/20">
+                            <div>
+                                <p class="text-[13px] font-bold text-white shadow-black drop-shadow-md">How To Get Apps on VIP4F</p>
+                                <p class="text-[10px] text-gray-200">KGFender</p>
+                            </div>
+                        </div>
+                        <button class="w-14 h-10 bg-red-600 rounded-xl flex items-center justify-center text-white hover:scale-105 transition shadow-lg">
+                            <i class="fa-brands fa-youtube text-xl"></i>
+                        </button>
+                        <div class="absolute bottom-3 left-3 flex gap-3 text-white drop-shadow-md">
+                            <i class="fa-solid fa-share"></i>
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div class="absolute bottom-3 right-3 text-white font-bold drop-shadow-md flex items-center gap-1 text-[11px] bg-black/40 px-2 py-1 rounded-md">
+                            Regarder sur <i class="fa-brands fa-youtube"></i> YouTube
+                        </div>
+                    </div>
+                    <button onclick="showInstructionsModal()" class="w-full bg-[#5B65EB] hover:bg-[#4f58d3] text-white font-bold py-3.5 rounded-[1rem] transition shadow-lg text-[13px] tracking-wide">
+                        TEXT INSTRUCTIONS
+                    </button>
+                </section>
+
+                <!-- قسم Trending -->
+                <section class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-custom">Trending</h3>
+                    <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x">
+                        
+                        <!-- YouTube Mod -->
+                        <div class="min-w-[110px] bg-card-custom rounded-2xl p-3 flex flex-col items-center shadow-sm snap-start">
+                            <img src="https://i.postimg.cc/Kkny0rDc/0e3b94a92152d146429e9e468cdd62d6.jpg" alt="YouTube Mod" class="w-16 h-16 rounded-[14px] mb-3 object-cover shadow-md">
+                            <h4 class="font-bold text-[13px] text-custom mb-1 w-full text-center truncate">YouTube Mod</h4>
+                            <span class="text-[10px] text-muted-custom flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> Apps</span>
+                        </div>
+
+                        <!-- 8Ball Pool -->
+                        <div class="min-w-[110px] bg-card-custom rounded-2xl p-3 flex flex-col items-center shadow-sm snap-start">
+                            <img src="https://i.postimg.cc/34gHtCF4/0efe52004ad1ee560b422918cadee0c7.jpg" alt="8Ball Pool" class="w-16 h-16 rounded-[14px] mb-3 object-cover shadow-md">
+                            <h4 class="font-bold text-[13px] text-custom mb-1 w-full text-center truncate">8Ball Pool</h4>
+                            <span class="text-[10px] text-muted-custom flex items-center gap-1"><i class="fa-solid fa-gamepad"></i> Games</span>
+                        </div>
+
+                        <!-- Netflix Mod -->
+                        <div class="min-w-[110px] bg-card-custom rounded-2xl p-3 flex flex-col items-center shadow-sm snap-start">
+                            <img src="https://i.postimg.cc/cgQNFMBC/176fc791750a45f06395864a05e8f5ee.jpg" alt="Netflix Mod" class="w-16 h-16 rounded-[14px] mb-3 object-cover shadow-md">
+                            <h4 class="font-bold text-[13px] text-custom mb-1 w-full text-center truncate">Netflix Mod</h4>
+                            <span class="text-[10px] text-muted-custom flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> Apps</span>
+                        </div>
+
+                        <!-- TikTok Mod -->
+                        <div class="min-w-[110px] bg-card-custom rounded-2xl p-3 flex flex-col items-center shadow-sm snap-start">
+                            <img src="https://i.postimg.cc/xJKS6y39/2906cfdc7de398d677bac2e6825cf707.jpg" alt="TikTok Mod" class="w-16 h-16 rounded-[14px] mb-3 object-cover shadow-md">
+                            <h4 class="font-bold text-[13px] text-custom mb-1 w-full text-center truncate">TikTok Mod</h4>
+                            <span class="text-[10px] text-muted-custom flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> Apps</span>
+                        </div>
+
+                        <!-- ChatGPT+ Mod -->
+                        <div class="min-w-[110px] bg-card-custom rounded-2xl p-3 flex flex-col items-center shadow-sm snap-start">
+                            <img src="https://i.postimg.cc/dk8K5mjV/2b7b2738a8b5557fc284e3ec67c22769.jpg" alt="ChatGPT+ Mod" class="w-16 h-16 rounded-[14px] mb-3 object-cover shadow-md">
+                            <h4 class="font-bold text-[13px] text-custom mb-1 w-full text-center truncate">ChatGPT+</h4>
+                            <span class="text-[10px] text-muted-custom flex items-center gap-1"><i class="fa-solid fa-mobile-screen"></i> Apps</span>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- قسم New Games -->
+                <section class="mb-8">
+                    <div class="flex justify-between items-end mb-4">
+                        <h3 class="text-xl font-bold text-custom">New Games</h3>
+                        <a href="#" class="text-[#5B65EB] text-sm font-bold hover:underline">View all</a>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        
+                        <!-- CarX Street Mod -->
+                        <div class="bg-card-custom rounded-[1.2rem] p-3 flex items-center gap-4 fade-in-up">
+                            <img src="https://i.postimg.cc/bDQjmH92/490bf914b7d9730c17166f9d4272e99b.jpg" alt="CarX Street Mod" class="w-[60px] h-[60px] rounded-[14px] flex-shrink-0 object-cover shadow-md">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-custom text-[15px] leading-tight mb-1">CarX Street Mod</h4>
+                                <div class="flex gap-4 text-[11px] text-muted-custom font-medium">
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-down"></i> Size: 1.5GB</span>
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-[#5B65EB]"></i> Rating: 4.9</span>
+                                </div>
+                            </div>
+                            <button class="w-10 h-10 rounded-full bg-[#5B65EB]/10 text-[#5B65EB] flex items-center justify-center hover:bg-[#5B65EB] hover:text-white transition shadow-sm">
+                                <i class="fa-solid fa-play ml-0.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- PUBG Mobile -->
+                        <div class="bg-card-custom rounded-[1.2rem] p-3 flex items-center gap-4 fade-in-up">
+                            <img src="https://i.postimg.cc/zbn1xSFH/516a74d6d701c86c007f668d7cf2891a.jpg" alt="PUBG Mobile" class="w-[60px] h-[60px] rounded-[14px] flex-shrink-0 object-cover shadow-md">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-custom text-[15px] leading-tight mb-1">PUBG Mobile</h4>
+                                <div class="flex gap-4 text-[11px] text-muted-custom font-medium">
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-down"></i> Size: 2.1GB</span>
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-[#5B65EB]"></i> Rating: 4.8</span>
+                                </div>
+                            </div>
+                            <button class="w-10 h-10 rounded-full bg-[#5B65EB]/10 text-[#5B65EB] flex items-center justify-center hover:bg-[#5B65EB] hover:text-white transition shadow-sm">
+                                <i class="fa-solid fa-play ml-0.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- Snap+ Mod -->
+                        <div class="bg-card-custom rounded-[1.2rem] p-3 flex items-center gap-4 fade-in-up">
+                            <img src="https://i.postimg.cc/HcQC649x/a57f81feccd968c8951f48d862af8b72.jpg" alt="Snap+ Mod" class="w-[60px] h-[60px] rounded-[14px] flex-shrink-0 object-cover shadow-md">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-custom text-[15px] leading-tight mb-1">Snap+ Mod</h4>
+                                <div class="flex gap-4 text-[11px] text-muted-custom font-medium">
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-down"></i> Size: 110MB</span>
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-[#5B65EB]"></i> Rating: 4.7</span>
+                                </div>
+                            </div>
+                            <button class="w-10 h-10 rounded-full bg-[#5B65EB]/10 text-[#5B65EB] flex items-center justify-center hover:bg-[#5B65EB] hover:text-white transition shadow-sm">
+                                <i class="fa-solid fa-play ml-0.5"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Spotify+ Mod -->
+                        <div class="bg-card-custom rounded-[1.2rem] p-3 flex items-center gap-4 fade-in-up">
+                            <img src="https://i.postimg.cc/34gHtCFy/b1ed9e158c5d8436b2af98522a8e1881.jpg" alt="Spotify+ Mod" class="w-[60px] h-[60px] rounded-[14px] flex-shrink-0 object-cover shadow-md">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-custom text-[15px] leading-tight mb-1">Spotify+ Mod</h4>
+                                <div class="flex gap-4 text-[11px] text-muted-custom font-medium">
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-down"></i> Size: 55MB</span>
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-[#5B65EB]"></i> Rating: 5.0</span>
+                                </div>
+                            </div>
+                            <button class="w-10 h-10 rounded-full bg-[#5B65EB]/10 text-[#5B65EB] flex items-center justify-center hover:bg-[#5B65EB] hover:text-white transition shadow-sm">
+                                <i class="fa-solid fa-play ml-0.5"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Plugin -->
+                        <div class="bg-card-custom rounded-[1.2rem] p-3 flex items-center gap-4 fade-in-up">
+                            <img src="https://i.postimg.cc/xJKS6y39/2906cfdc7de398d677bac2e6825cf707.jpg" alt="Plugin" class="w-[60px] h-[60px] rounded-[14px] flex-shrink-0 object-cover shadow-md" onerror="this.src='https://ui-avatars.com/api/?name=Plugin&background=5B65EB&color=fff'">
+                            <div class="flex-1">
+                                <h4 class="font-bold text-custom text-[15px] leading-tight mb-1">Plugin</h4>
+                                <div class="flex gap-4 text-[11px] text-muted-custom font-medium">
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-cloud-arrow-down"></i> Size: 15MB</span>
+                                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-[#5B65EB]"></i> Rating: 4.6</span>
+                                </div>
+                            </div>
+                            <button class="w-10 h-10 rounded-full bg-[#5B65EB]/10 text-[#5B65EB] flex items-center justify-center hover:bg-[#5B65EB] hover:text-white transition shadow-sm">
+                                <i class="fa-solid fa-play ml-0.5"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+            <!-- اللودر -->
+            <div id="loader" class="hidden loader-wrapper absolute inset-0 z-10 bg-[var(--bg-main)]">
+                <div class="concentric-loader">
+                    <div></div>
+                    <div></div>
+                </div>
+            </div>
+
+            <!-- قسم الشبكة (Grid) -->
+            <div id="grid-content" class="hidden">
+                <div id="apps-grid-container" class="grid grid-cols-2 gap-4 pb-6 mt-2">
+                    <!-- تعبئة بواسطة جافاسكريبت -->
+                </div>
+            </div>
+            
+            <div class="text-center text-[9px] text-muted-custom mt-6 mb-8 px-4 opacity-60">
+                All trademarks, service marks, trade names, trade dress, product names and logos appearing on the site are the property of their respective owners.
+            </div>
+
+        </main>
+
+        <!-- الشريط السفلي -->
+        <nav id="bottom-nav" class="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[440px] rounded-[1.2rem] flex justify-between items-center p-1.5 z-40 shadow-2xl">
+            <button onclick="switchTab('discover', this)" class="nav-btn active-tab flex-1 flex flex-row items-center justify-center py-2.5 px-2 rounded-xl bg-[#5B65EB]/10 text-[#5B65EB] transition">
+                <i class="fa-regular fa-compass text-lg mr-1.5"></i>
+                <span class="text-xs font-bold">Discover</span>
+            </button>
+            <button onclick="switchTab('games', this)" class="nav-btn flex-1 flex flex-row items-center justify-center py-2.5 px-2 rounded-xl text-muted-custom hover:text-custom transition">
+                <i class="fa-solid fa-gamepad text-lg mr-1.5"></i>
+                <span class="text-xs font-bold">Games</span>
+            </button>
+            <button onclick="switchTab('apps', this)" class="nav-btn flex-1 flex flex-row items-center justify-center py-2.5 px-2 rounded-xl text-muted-custom hover:text-custom transition">
+                <i class="fa-solid fa-mobile-screen text-lg mr-1.5"></i>
+                <span class="text-xs font-bold">Apps</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        document.body.style.overflow = 'hidden';
+
+        function showImportantModal() {
+            document.getElementById('welcomeModal').classList.add('hidden');
+            const importantModal = document.getElementById('importantModal');
+            importantModal.classList.remove('hidden');
+            importantModal.classList.add('modal-enter');
+        }
+
+        function showInstructionsModal() {
+            document.getElementById('welcomeModal').classList.add('hidden');
+            document.getElementById('importantModal').classList.add('hidden');
+            document.getElementById('modalsOverlay').style.display = 'flex';
+            const instructionsModal = document.getElementById('instructionsModal');
+            instructionsModal.classList.remove('hidden');
+            instructionsModal.classList.add('modal-enter');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModals() {
+            document.getElementById('modalsOverlay').style.display = 'none';
+            document.getElementById('welcomeModal').classList.add('hidden');
+            document.getElementById('importantModal').classList.add('hidden');
+            document.getElementById('instructionsModal').classList.add('hidden');
+            document.body.style.overflow = 'auto'; 
+        }
+
+        let isLightMode = false;
+        function toggleTheme() {
+            isLightMode = !isLightMode;
+            const themeIcon = document.getElementById('themeIcon');
+            if (isLightMode) {
+                document.body.classList.add('light-mode');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                document.body.classList.remove('light-mode');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        let lastScrollTop = 0;
+        const bottomNav = document.getElementById('bottom-nav');
+
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > 50) {
+                bottomNav.style.transform = 'translate(-50%, 150%)'; 
+            } else {
+                bottomNav.style.transform = 'translate(-50%, 0)'; 
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+        }, false);
+
+        // --- قائمة الألعاب والتطبيقات ---
+        const gridAppsData = [
+            { name: "YouTube Mod", size: "90MB", rating: "5.0", badge: "MOD", imgSrc: "https://i.postimg.cc/Kkny0rDc/0e3b94a92152d146429e9e468cdd62d6.jpg" },
+            { name: "8Ball Pool", size: "120MB", rating: "4.7", badge: "MOD", imgSrc: "https://i.postimg.cc/34gHtCF4/0efe52004ad1ee560b422918cadee0c7.jpg" },
+            { name: "Netflix Mod", size: "80MB", rating: "4.9", badge: "MOD", imgSrc: "https://i.postimg.cc/cgQNFMBC/176fc791750a45f06395864a05e8f5ee.jpg" },
+            { name: "TikTok Mod", size: "150MB", rating: "4.8", badge: "MOD", imgSrc: "https://i.postimg.cc/xJKS6y39/2906cfdc7de398d677bac2e6825cf707.jpg" },
+            { name: "ChatGPT+ Mod", size: "40MB", rating: "5.0", badge: "MOD", imgSrc: "https://i.postimg.cc/dk8K5mjV/2b7b2738a8b5557fc284e3ec67c22769.jpg" },
+            { name: "CarX Street Mod", size: "1.5GB", rating: "4.9", badge: "MOD", imgSrc: "https://i.postimg.cc/bDQjmH92/490bf914b7d9730c17166f9d4272e99b.jpg" },
+            { name: "PUBG Mobile", size: "2.1GB", rating: "4.8", badge: "MOD", imgSrc: "https://i.postimg.cc/zbn1xSFH/516a74d6d701c86c007f668d7cf2891a.jpg" },
+            { name: "Snap+ Mod", size: "110MB", rating: "4.7", badge: "MOD", imgSrc: "https://i.postimg.cc/HcQC649x/a57f81feccd968c8951f48d862af8b72.jpg" },
+            { name: "Spotify+ Mod", size: "55MB", rating: "5.0", badge: "MOD", imgSrc: "https://i.postimg.cc/34gHtCFy/b1ed9e158c5d8436b2af98522a8e1881.jpg" },
+            { name: "Plugin", size: "15MB", rating: "4.6", badge: "TOOL", imgSrc: "https://i.postimg.cc/xJKS6y39/2906cfdc7de398d677bac2e6825cf707.jpg", fallbackBg:"from-indigo-500 to-purple-600", icon:"fa-solid fa-plug" }
+        ];
+
+        function renderAppsGrid() {
+            const container = document.getElementById('apps-grid-container');
+            container.innerHTML = ''; 
+
+            gridAppsData.forEach((app, index) => {
+                const delay = index * 0.05;
+                
+                const imageHtml = app.imgSrc 
+                    ? `<img src="${app.imgSrc}" alt="${app.name}" class="w-full h-full object-cover rounded-[22px]">`
+                    : `<div class="w-full h-full bg-gradient-to-br ${app.fallbackBg} flex items-center justify-center rounded-[22px]"><i class="${app.icon} text-4xl text-white/90 drop-shadow-md"></i></div>`;
+
+                const cardHTML = `
+                    <div class="bg-card-custom rounded-2xl p-3 flex flex-col items-center relative shadow-sm fade-in-up" style="animation-delay: ${delay}s">
+                        ${app.badge ? `<span class="absolute top-1 right-2 bg-[#5B65EB] text-white text-[9px] font-black px-2 py-0.5 rounded-md z-10 tracking-wider shadow-sm">${app.badge}</span>` : ''}
+                        
+                        <div class="w-full aspect-square app-icon flex items-center justify-center mb-3 relative overflow-hidden">
+                            ${imageHtml}
+                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/10 to-transparent pointer-events-none"></div>
+                        </div>
+                        
+                        <h4 class="font-bold text-[13px] text-custom text-center w-full truncate leading-tight mb-2">${app.name}</h4>
+                        
+                        <div class="flex justify-between w-full text-[10px] text-muted-custom px-1.5">
+                            <div class="flex flex-col items-start gap-0.5">
+                                <div class="flex items-center gap-1"><i class="fa-solid fa-cloud-arrow-down text-[9px]"></i><span>Size:</span></div>
+                                <span class="font-bold text-custom">${app.size}</span>
+                            </div>
+                            <div class="flex flex-col items-end gap-0.5">
+                                <div class="flex items-center gap-1"><i class="fa-solid fa-star text-[9px]"></i><span>Rating:</span></div>
+                                <span class="font-bold text-custom">${app.rating}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        function switchTab(tabName, btnElement) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = 'nav-btn flex-1 flex flex-row items-center justify-center py-2.5 px-2 rounded-xl text-muted-custom hover:text-custom transition';
+            });
+            btnElement.className = 'nav-btn active-tab flex-1 flex flex-row items-center justify-center py-2.5 px-2 rounded-xl bg-[#5B65EB]/10 text-[#5B65EB] transition';
+
+            const discoverContent = document.getElementById('discover-content');
+            const gridContent = document.getElementById('grid-content');
+            const loader = document.getElementById('loader');
+
+            discoverContent.style.display = 'none';
+            gridContent.style.display = 'none';
+            loader.style.display = 'flex';
+            window.scrollTo(0, 0); 
+
+            setTimeout(() => {
+                loader.style.display = 'none';
+                
+                if(tabName === 'discover') {
+                    discoverContent.style.display = 'block';
+                } else {
+                    gridContent.style.display = 'block';
+                    renderAppsGrid(); 
+                }
+            }, 800);
+        }
+
+        renderAppsGrid();
+    </script>
+</body>
+</html>
+
+
+
+
+
+```
